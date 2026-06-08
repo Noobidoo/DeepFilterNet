@@ -14,19 +14,23 @@ jobs:
         include:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            lib: deep_filter.dll
+            src_lib: df.dll
+            lib: deep_filter_lib.dll
             zip: deep_filter_lib-x86_64-windows.zip
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
-            lib: libdeep_filter.so
+            src_lib: libdf.so
+            lib: libdeep_filter_lib.so
             zip: libdeep_filter_lib-x86_64-linux.zip
           - os: macos-13
             target: x86_64-apple-darwin
-            lib: libdeep_filter.dylib
+            src_lib: libdf.dylib
+            lib: libdeep_filter_lib.dylib
             zip: libdeep_filter_lib-x86_64-macos.zip
           - os: macos-14
             target: aarch64-apple-darwin
-            lib: libdeep_filter.dylib
+            src_lib: libdf.dylib
+            lib: libdeep_filter_lib.dylib
             zip: libdeep_filter_lib-arm64-macos.zip
     runs-on: ${{ matrix.os }}
     steps:
@@ -35,7 +39,7 @@ jobs:
         with:
           targets: ${{ matrix.target }}
       - run: cargo build --release -p deep_filter --features capi --target ${{ matrix.target }}
-      - run: mkdir staging && cp target/${{ matrix.target }}/release/${{ matrix.lib }} staging/
+      - run: mkdir staging && cp target/${{ matrix.target }}/release/${{ matrix.src_lib }} staging/${{ matrix.lib }}
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.zip }}
