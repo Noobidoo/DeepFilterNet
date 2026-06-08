@@ -22,11 +22,6 @@ jobs:
             src_lib: libdf.so
             lib: libdeep_filter_lib.so
             zip: libdeep_filter_lib-x86_64-linux.zip
-          - os: macos-13
-            target: x86_64-apple-darwin
-            src_lib: libdf.dylib
-            lib: libdeep_filter_lib.dylib
-            zip: libdeep_filter_lib-x86_64-macos.zip
           - os: macos-14
             target: aarch64-apple-darwin
             src_lib: libdf.dylib
