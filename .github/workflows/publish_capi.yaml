@@ -1,0 +1,61 @@
+name: Publish CAPI Libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v0.5.7-capi.1)'
+        required: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: dll
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            ext: so
+          - os: macos-13
+            target: x86_64-apple-darwin
+            ext: dylib
+          - os: macos-14
+            target: aarch64-apple-darwin
+            ext: dylib
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: cargo build --release -p deep_filter --features capi --target ${{ matrix.target }}
+      - run: mkdir staging && cp target/${{ matrix.target }}/release/deep_filter.${{ matrix.ext }} staging/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: capi-${{ matrix.target }}
+          path: staging/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - run: |
+          mkdir zips
+          cd artifacts
+          mv capi-x86_64-pc-windows-msvc/*       ../zips/deep_filter_lib-x86_64-windows.zip
+          mv capi-x86_64-unknown-linux-gnu/*      ../zips/libdeep_filter_lib-x86_64-linux.zip
+          mv capi-x86_64-apple-darwin/*           ../zips/libdeep_filter_lib-x86_64-macos.zip
+          mv capi-aarch64-apple-darwin/*          ../zips/libdeep_filter_lib-arm64-macos.zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          files: zips/*
+          draft: false
+          prerelease: true
