@@ -27,12 +27,43 @@ jobs:
             src_lib: libdf.dylib
             lib: libdeep_filter_lib.dylib
             zip: libdeep_filter_lib-arm64-macos.zip
+          - os: ubuntu-22.04
+            target: aarch64-linux-android
+            ndk_arch: aarch64-linux-android26
+            src_lib: libdf.so
+            lib: libdeep_filter_lib.so
+            zip: libdeep_filter_lib-arm64-android.zip
+          - os: ubuntu-22.04
+            target: armv7-linux-androideabi
+            ndk_arch: armv7a-linux-androideabi26
+            src_lib: libdf.so
+            lib: libdeep_filter_lib.so
+            zip: libdeep_filter_lib-arm-android.zip
+          - os: ubuntu-22.04
+            target: x86_64-linux-android
+            ndk_arch: x86_64-linux-android26
+            src_lib: libdf.so
+            lib: libdeep_filter_lib.so
+            zip: libdeep_filter_lib-x86_64-android.zip
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+      - name: Install Android NDK and configure linker
+        if: ${{ contains(matrix.target, 'android') }}
+        run: |
+          curl -fsSL https://dl.google.com/android/repository/android-ndk-r28-linux.zip -o /tmp/ndk-r28.zip
+          unzip -q /tmp/ndk-r28.zip -d /tmp/
+          NDK_HOME=$(ls -d /tmp/android-ndk-*/ | head -1)
+          echo "ANDROID_NDK_HOME=$NDK_HOME" >> $GITHUB_ENV
+          echo "$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+          mkdir -p .cargo
+          cat > .cargo/config.toml << EOF
+          [target.${{ matrix.target }}]
+          linker = "$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.ndk_arch }}-clang"
+          EOF
       - run: cargo build --release -p deep_filter --features capi --target ${{ matrix.target }}
       - run: mkdir staging && cp target/${{ matrix.target }}/release/${{ matrix.src_lib }} staging/${{ matrix.lib }}
       - uses: actions/upload-artifact@v4
