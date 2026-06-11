@@ -23,7 +23,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
+          targets: wasm32-unknown-unknown
 
       # https://rustwasm.github.io/wasm-pack/installer/
       - name: Install wasm-pack
