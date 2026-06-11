@@ -64,6 +64,24 @@ jobs:
           [target.${{ matrix.target }}]
           linker = "$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.ndk_arch }}-clang"
           EOF
+      - name: Create NDK compiler symlinks for tract-linalg cc crate
+        if: ${{ contains(matrix.target, 'android') }}
+        run: |
+          NDK_BIN="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          case "${{ matrix.ndk_arch }}" in
+            armv7a-*)
+              ln -sf "$NDK_BIN/${{ matrix.ndk_arch }}-clang"    "$NDK_BIN/arm-linux-androideabi-clang"
+              ln -sf "$NDK_BIN/${{ matrix.ndk_arch }}-clang++"  "$NDK_BIN/arm-linux-androideabi-clang++"
+              ;;
+            aarch64-*)
+              ln -sf "$NDK_BIN/${{ matrix.ndk_arch }}-clang"    "$NDK_BIN/aarch64-linux-android-clang"
+              ln -sf "$NDK_BIN/${{ matrix.ndk_arch }}-clang++"  "$NDK_BIN/aarch64-linux-android-clang++"
+              ;;
+            x86_64-*)
+              ln -sf "$NDK_BIN/${{ matrix.ndk_arch }}-clang"    "$NDK_BIN/x86_64-linux-android-clang"
+              ln -sf "$NDK_BIN/${{ matrix.ndk_arch }}-clang++"  "$NDK_BIN/x86_64-linux-android-clang++"
+              ;;
+          esac
       - run: cargo build --release -p deep_filter --features capi --target ${{ matrix.target }}
       - run: mkdir staging && cp target/${{ matrix.target }}/release/${{ matrix.src_lib }} staging/${{ matrix.lib }}
       - uses: actions/upload-artifact@v4
