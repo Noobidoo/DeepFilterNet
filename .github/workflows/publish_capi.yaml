@@ -27,24 +27,24 @@ jobs:
             src_lib: libdf.dylib
             lib: libdeep_filter_lib.dylib
             zip: libdeep_filter_lib-arm64-macos.zip
-           - os: ubuntu-22.04
-             target: aarch64-linux-android
-             ndk_arch: aarch64-linux-android26
-             src_lib: libdf.so
-             lib: libdeep_filter_lib-arm64-android.so
-             zip: libdeep_filter_lib-arm64-android.zip
-           - os: ubuntu-22.04
-             target: armv7-linux-androideabi
-             ndk_arch: armv7a-linux-androideabi26
-             src_lib: libdf.so
-             lib: libdeep_filter_lib-arm-android.so
-             zip: libdeep_filter_lib-arm-android.zip
-           - os: ubuntu-22.04
-             target: x86_64-linux-android
-             ndk_arch: x86_64-linux-android26
-             src_lib: libdf.so
-             lib: libdeep_filter_lib-x86_64-android.so
-             zip: libdeep_filter_lib-x86_64-android.zip
+          - os: ubuntu-22.04
+            target: aarch64-linux-android
+            ndk_arch: aarch64-linux-android26
+            src_lib: libdf.so
+            lib: libdeep_filter_lib-arm64-android.so
+            zip: libdeep_filter_lib-arm64-android.zip
+          - os: ubuntu-22.04
+            target: armv7-linux-androideabi
+            ndk_arch: armv7a-linux-androideabi26
+            src_lib: libdf.so
+            lib: libdeep_filter_lib-arm-android.so
+            zip: libdeep_filter_lib-arm-android.zip
+          - os: ubuntu-22.04
+            target: x86_64-linux-android
+            ndk_arch: x86_64-linux-android26
+            src_lib: libdf.so
+            lib: libdeep_filter_lib-x86_64-android.so
+            zip: libdeep_filter_lib-x86_64-android.zip
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
